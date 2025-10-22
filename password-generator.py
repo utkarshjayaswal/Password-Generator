@@ -2,6 +2,36 @@ import random
 import string
 import sys
 
+def generate_password(length=12):
+    """
+    Generate a random password of specified length using letters, numbers, and special characters
+    
+    Parameters:
+    - length: Length of the password (default: 12)
+    """
+    # Define character sets
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    special = "!@#$%^&*"
+    
+    # Ensure at least one character from each set
+    password = [
+        random.choice(lowercase),
+        random.choice(uppercase),
+        random.choice(digits),
+        random.choice(special)
+    ]
+    
+    # Fill the rest of the password
+    remaining_length = length - len(password)
+    all_chars = lowercase + uppercase + digits + special
+    password.extend(random.choice(all_chars) for _ in range(remaining_length))
+    
+    # Shuffle the password characters
+    random.shuffle(password)
+    return ''.join(password)
+
 def load_wordlist():
     """Returns a list of common words for generating passphrases"""
     words = [
@@ -44,19 +74,35 @@ def generate_passphrase(num_words=3, add_number=True, add_special=True):
 
 def main():
     print("\n=== Friendly Password Generator ===\n")
+    print("1. Generate a memorable passphrase")
+    print("2. Generate a random password")
     
     try:
-        num_words = int(input("How many words would you like in your passphrase? (2-5, default: 3): ") or 3)
-        num_words = max(2, min(5, num_words))  # Ensure number is between 2 and 5
+        choice = int(input("\nEnter your choice (1 or 2): "))
         
-        add_number = input("Would you like to add a number? (y/n, default: y): ").lower() != 'n'
-        add_special = input("Would you like to add a special character? (y/n, default: y): ").lower() != 'n'
+        if choice == 1:
+            num_words = int(input("\nHow many words would you like in your passphrase? (2-5, default: 3): ") or 3)
+            num_words = max(2, min(5, num_words))  # Ensure number is between 2 and 5
+            
+            add_number = input("Would you like to add a number? (y/n, default: y): ").lower() != 'n'
+            add_special = input("Would you like to add a special character? (y/n, default: y): ").lower() != 'n'
+            
+            result = generate_passphrase(num_words, add_number, add_special)
+            print("\nYour generated passphrase is:")
         
-        passphrase = generate_passphrase(num_words, add_number, add_special)
+        elif choice == 2:
+            length = int(input("\nEnter desired password length (8-32, default: 12): ") or 12)
+            length = max(8, min(32, length))  # Ensure length is between 8 and 32
+            
+            result = generate_password(length)
+            print("\nYour generated password is:")
         
-        print("\nYour generated passphrase is:")
-        print(f"\n\t{passphrase}\n")
-        print("This passphrase is both memorable and secure!")
+        else:
+            print("\nInvalid choice. Please choose 1 or 2.")
+            sys.exit(1)
+            
+        print(f"\n\t{result}\n")
+        print("This password is secure!")
         print("Remember to store it safely and never share it with anyone.")
         
     except KeyboardInterrupt:
